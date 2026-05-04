@@ -408,16 +408,17 @@ def main():
 		st.write("### CSV로 저장 (파일명 지정)")
 		save_name = st.text_input("저장할 파일명", value="export_score.csv")
 		if st.button("파일로 저장"):
-			# sanitize filename and save to current working directory
+			# prepare CSV bytes and provide a download button (safer than saving on server)
 			fname = os.path.basename(save_name.strip())
 			if not fname:
 				st.error("유효한 파일명을 입력하세요")
 			else:
 				try:
-					df.to_csv(fname, index=False)
-					st.success(f"{fname}에 저장했습니다")
+					csv_bytes = df.to_csv(index=False).encode("utf-8-sig")
+					st.download_button(label=f"다운로드 {fname}", data=csv_bytes, file_name=fname, mime="text/csv")
+					st.success(f"다운로드 버튼이 생성되었습니다 — 클릭하여 {fname}을(를) 저장하세요.")
 				except Exception as e:
-					st.error(f"저장 실패: {e}")
+					st.error(f"다운로드 준비 실패: {e}")
 
 
 if __name__ == "__main__":
